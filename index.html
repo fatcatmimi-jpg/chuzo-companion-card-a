@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>出走｜陪行卡</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Noto Sans TC', 'Microsoft JhengHei', sans-serif;
+            background: linear-gradient(135deg, #f5f0e8 0%, #e8e0d5 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        h1 {
+            color: #6b5b4f;
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            letter-spacing: 3px;
+        }
+        
+        .subtitle {
+            color: #8b7b6b;
+            font-size: 0.9rem;
+            margin-bottom: 30px;
+        }
+        
+        .card-container {
+            perspective: 1000px;
+            margin: 20px auto;
+            width: 200px;
+            height: 290px;
+        }
+        
+        .card {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.8s ease;
+            cursor: pointer;
+        }
+        
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+        
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            overflow: hidden;
+        }
+        
+        .card-back {
+            background: linear-gradient(145deg, #c9b896, #a89878);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid #8b7b5a;
+        }
+        
+        .card-back::before {
+            content: "✦";
+            font-size: 60px;
+            color: rgba(255,255,255,0.3);
+        }
+        
+        .card-front {
+            transform: rotateY(180deg);
+            background: #fff;
+        }
+        
+        .card-front img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .draw-btn {
+            background: linear-gradient(145deg, #b8a07a, #9a8868);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            border-radius: 30px;
+            cursor: pointer;
+            margin: 20px 0;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            letter-spacing: 2px;
+        }
+        
+        .draw-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+        
+        .draw-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .message-box {
+            background: rgba(255,255,255,0.8);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            display: none;
+        }
+        
+        .message-box.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .card-name {
+            color: #6b5b4f;
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .card-quote {
+            color: #8b7b6b;
+            font-size: 1rem;
+            line-height: 1.6;
+            font-style: italic;
+        }
+        
+        .reset-btn {
+            background: transparent;
+            color: #8b7b6b;
+            border: 1px solid #8b7b6b;
+            padding: 10px 25px;
+            font-size: 0.9rem;
+            border-radius: 20px;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .reset-btn:hover {
+            background: #8b7b6b;
+            color: white;
+        }
+        
+        .footer {
+            margin-top: 40px;
+            color: #a09080;
+            font-size: 0.8rem;
+        }
+        
+        .instruction {
+            color: #8b7b6b;
+            font-size: 0.85rem;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>出走｜陪行卡</h1>
+        <p class="subtitle">你的陪行指南</p>
+        
+        <p class="instruction">靜下心來，想著你的問題<br>然後點擊下方抽取一張牌</p>
+        
+        <div class="card-container">
+            <div class="card" id="card">
+                <div class="card-face card-back"></div>
+                <div class="card-face card-front">
+                    <img id="cardImage" src="" alt="牌卡">
+                </div>
+            </div>
+        </div>
+        
+        <button class="draw-btn" id="drawBtn" onclick="drawCard()">抽 一 張 牌</button>
+        
+        <div class="message-box" id="messageBox">
+            <p class="card-name" id="cardName"></p>
+            <p class="card-quote" id="cardQuote"></p>
+            <button class="reset-btn" onclick="resetCard()">再抽一次</button>
+        </div>
+        
+        <p class="footer">遛狗人工作室 ✦ 作者：玄曉</p>
+    </div>
+    
+    <script>
+        const cards = [
+            { num: "01", name: "無聲的餐桌", quote: "離開那些讓你感到孤獨的人群，那不是孤單，是自由。" },
+            { num: "02", name: "塵封的紙箱", quote: "你的夢想沒有過期，它只是在等你不怕髒地把它找出來。" },
+            { num: "03", name: "單程機票", quote: "抵達終點並不難，難的是那踏出的第一步。" },
+            { num: "04", name: "雨中的側臉", quote: "當你不再挑剔自己，才是真正美麗的開始。" },
+            { num: "05", name: "苔清水", quote: "心靜下來，答案就會像煙一樣浮現。" },
+            { num: "06", name: "第一支畫筆", quote: "畫壞了又怎樣？人生這張紙，本來就是拿來塗鴉的。" },
+            { num: "07", name: "河粉與板凳", quote: "生活的滋味不在高處，而在充滿煙火氣的街頭。" },
+            { num: "08", name: "燈籠之河", quote: "隨波逐流不是壞事，有時候水流會帶你去對的地方。" },
+            { num: "09", name: "混亂的摩托", quote: "在混亂中保持自己的節奏，誰也亂不了你。" },
+            { num: "10", name: "手作的春捲", quote: "不怕弄髒雙手，才能創造自己喜歡的東西。" },
+            { num: "11", name: "窗邊的素描", quote: "別只顧著趕路，記得把風景收進心裡。" },
+            { num: "12", name: "冰河的裂縫", quote: "裂縫讓你看見了深處，看見真正的你。" },
+            { num: "13", name: "伸出的手", quote: "有時候，接受幫助比獨自堅強需要更大的勇氣。" },
+            { num: "14", name: "同步呼吸", quote: "最好的伴侶不是拉著你走，而是調整呼吸與你並肩。" },
+            { num: "15", name: "山頂的湖", quote: "像湖水一樣平靜下來，你就能倒映出真實的自己。" },
+            { num: "16", name: "爐火與紅酒", quote: "信任的起點，是願意和一個人靜靜待著。" },
+            { num: "17", name: "南十字星", quote: "迷路的時候，抬頭，星星會告訴你方向。" },
+            { num: "18", name: "公路電影", quote: "重要的不是去哪裡，而是誰坐在你身旁。" },
+            { num: "19", name: "風吹開的畫本", quote: "願意被看見真正的自己，那才是關係的開始。" },
+            { num: "20", name: "紅杉巨人", quote: "在時間面前我們都很渺小，所以別把煩惱看得太大。" },
+            { num: "21", name: "停電的木屋", quote: "黑暗不可怕，它只是在告訴你，你需要一個擁抱。" },
+            { num: "22", name: "擁抱的溫度", quote: "給出一個擁抱，那是最美的禮物。" },
+            { num: "23", name: "未完成的城堡", quote: "夢想不需要完美，殘缺本身也是一種美。" },
+            { num: "24", name: "胡桃鉗娃娃", quote: "和解不一定需要原諒，有時候只需要一個轉身。" },
+            { num: "25", name: "維納斯的凝視", quote: "你不需要成為女神，你只需要成為你自己。" },
+            { num: "26", name: "穹頂之上", quote: "身後是他人眼光的地獄，眼前是自我寬恕的天堂。" },
+            { num: "27", name: "基督山的擁抱", quote: "張開雙臂，你已經準備好擁抱世界了。" },
+            { num: "28", name: "瀑布的尖叫", quote: "想哭就哭，想叫就叫，把情緒沖刷乾淨吧。" },
+            { num: "29", name: "天空之鏡", quote: "你不需要尋找答案了，因為你就是答案本身。" },
+            { num: "30", name: "高原的色彩", quote: "生命本該是五彩斑斕的，別活成黑白的。" },
+            { num: "31", name: "雲端的古城", quote: "走過的路都不會白費，它們是你登頂的基石。" },
+            { num: "32", name: "未完成的巨人", quote: "未完成又怎樣？那代表你還沒有結束。" },
+            { num: "33", name: "藍白之間", quote: "允許自己什麼都不做，那也是一種生活。" },
+            { num: "34", name: "餐巾紙上的貓", quote: "毫不費力的快樂，才是最高級的藝術。" },
+            { num: "35", name: "混亂中的貓", quote: "世界再吵，你也可以像貓一樣優雅地路過。" },
+            { num: "36", name: "熱氣球的晨曦", quote: "換個高度看世界，原本過不去的坎都變成了風景。" },
+            { num: "37", name: "地下城的光", quote: "即使在最深的地底，光也會找到縫隙鑽進來。" },
+            { num: "38", name: "殘缺的圖書館", quote: "時間會帶走多餘的裝飾，留下的才是本質。" },
+            { num: "39", name: "尼羅河的風帆", quote: "生命是循環，今天的日落是為了明天的升起。" },
+            { num: "40", name: "沙漠的星空", quote: "在極致的安靜中，你會聽見內心的聲音。" },
+            { num: "41", name: "巨像的凝視", quote: "存在，本身就是意義。" },
+            { num: "42", name: "極光下的並肩", quote: "真正的愛，是並肩看向同一片風景。" },
+            { num: "43", name: "光與迴聲", quote: "傷痕不是用來遮掩的，是過去的你修補成的榮耀。" },
+            { num: "44", name: "新的空白頁", quote: "結局已經寫好，但新的篇章才正要開始。" }
+        ];
+        
+        let isDrawn = false;
+        
+        function drawCard() {
+            if (isDrawn) return;
+            
+            const randomIndex = Math.floor(Math.random() * cards.length);
+            const selectedCard = cards[randomIndex];
+            
+            // 設定圖片（使用相對路徑）
+            const imgNum = selectedCard.num;
+            const imgExt = imgNum === "41" ? "png" : "jpg";
+            document.getElementById('cardImage').src = `cards/No.${imgNum}_牌卡.${imgExt}`;
+            
+            // 翻牌動畫
+            document.getElementById('card').classList.add('flipped');
+            document.getElementById('drawBtn').disabled = true;
+            
+            // 顯示訊息
+            setTimeout(() => {
+                document.getElementById('cardName').textContent = `No.${selectedCard.num} ${selectedCard.name}`;
+                document.getElementById('cardQuote').textContent = `「${selectedCard.quote}」`;
+                document.getElementById('messageBox').classList.add('show');
+            }, 800);
+            
+            isDrawn = true;
+        }
+        
+        function resetCard() {
+            document.getElementById('card').classList.remove('flipped');
+            document.getElementById('messageBox').classList.remove('show');
+            document.getElementById('drawBtn').disabled = false;
+            isDrawn = false;
+        }
+    </script>
+</body>
+</html>
